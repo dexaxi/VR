@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.InputSystem;
 public class TurnWheel : MonoBehaviour
 {
    [SerializeField] [Range(-0.5f, 2)]public float speedScalar;
@@ -9,26 +9,23 @@ public class TurnWheel : MonoBehaviour
    [SerializeField] public float maxPosXRot;
    [SerializeField] public float minPosXRot;
     public float currentPosXRot;
+    public GameObject wheel;
     
     public float Xrot;
     public float Yrot;
-    
-  
-    
+    bool fuckedUp;
+    public GameObject car;
 
-    
-    /// <summary>
-    /// This function is called every fixed framerate frame, if the MonoBehaviour is enabled.
-    /// </summary>
-    void FixedUpdate()
+
+ 
+    void Update()
     {   
-        currentPosXRot = Input.GetAxis("Horizontal");
-        Xrot = Mathf.Clamp(currentPosXRot,minPosXRot, maxPosXRot);
-        transform.Rotate(0,Xrot,0); 
-        turnScalar = Xrot;
 
-        Yrot = Input.GetAxis("Vertical");
+        currentPosXRot = wheel.transform.rotation.y;
+        turnScalar = -currentPosXRot;
         speedScalar = Yrot;
+        transform.parent = car.transform;
     }
-
+    
+ 
 }

@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.SceneManagement;
 public class HoverBoard : MonoBehaviour
 {
    
@@ -19,8 +19,13 @@ public class HoverBoard : MonoBehaviour
     //References
     Rigidbody hb;
     TurnWheel tw;
+
+    DifficultyScript settings;
+    ScoreScript scoreScript;
     void Start()
     {
+        settings = FindObjectOfType<DifficultyScript>();
+        scoreScript= FindObjectOfType<ScoreScript>();
         hb = GetComponent<Rigidbody>();
         tw = FindObjectOfType<TurnWheel>();
         initialMoveForce = moveForce;
@@ -33,10 +38,21 @@ public class HoverBoard : MonoBehaviour
 
     void FixedUpdate()
     {
-        
+        float speed = 0.5f;
+        switch (settings.difficulty){
+
+            case 0:  speed = 0.25f;
+            break;
+            case 1:  speed = 0.5f;
+            break;
+            case 2:  speed = 1f;
+            break;
+
+
+        }
         if(!grounded && moveForce > 0) {
 
-            turnTorque = initialTorqueForce / 3;
+            //turnTorque = initialTorqueForce / 3;
             moveForce += moveForce/1000;
             hb.AddForce(new Vector3(0,-gravity,0), ForceMode.Impulse);
             } 
@@ -47,7 +63,7 @@ public class HoverBoard : MonoBehaviour
         
         for (int i = 0; i < 4; i++) ApplyF(anchors[i], hits[i]);
         
-        hb.AddForce( (0.5f + tw.speedScalar) * moveForce * transform.forward);
+        hb.AddForce( ( speed+ tw.speedScalar) * moveForce * transform.forward);
         hb.AddTorque(tw.turnScalar * turnTorque * transform.up);
 
        
@@ -70,5 +86,17 @@ public class HoverBoard : MonoBehaviour
     void OnTriggerExit(Collider other)
     {
         if(other.gameObject.tag == "ground") grounded = false; 
+    }
+
+    public void Die(){
+        
+        SceneManager.LoadScene(3);
+        settings.score = scoreScript.score;
+
+
+    }
+
+    private void OnTriggerEnter(Collider other) {
+        if(other.tag == "death") Die();
     }
 }
